@@ -15,6 +15,13 @@
  */
 package com.netflix.hystrix.contrib.javanica.utils;
 
+import com.netflix.hystrix.HystrixExecutable;
+import com.netflix.hystrix.contrib.javanica.collapser.CommandCollapser;
+import com.netflix.hystrix.contrib.javanica.command.CommandExecutor;
+import com.netflix.hystrix.contrib.javanica.command.ExecutionType;
+import com.netflix.hystrix.contrib.javanica.command.GenericHystrixCommandFactory;
+import com.netflix.hystrix.contrib.javanica.command.MetaHolder;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
@@ -92,4 +99,21 @@ public final class AopUtils {
         return method;
     }
 
+    public static Object getHystrixResultFromMetaHolder(MetaHolder metaHolder) throws Throwable {
+        HystrixExecutable executable;
+        ExecutionType executionType = metaHolder.isCollapser() ?
+                metaHolder.getCollapserExecutionType() : metaHolder.getExecutionType();
+        if (metaHolder.isCollapser()) {
+            executable = new CommandCollapser(metaHolder);
+        } else {
+            executable = GenericHystrixCommandFactory.getInstance().create(metaHolder, null);
+        }
+        Object result;
+        try {
+            result = CommandExecutor.execute(executable, executionType);
+        } catch (HystrixBadRequestException e) {
+            throw e.getCause();
+        }
+        return result;
+    }
 }
