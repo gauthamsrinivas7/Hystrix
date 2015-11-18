@@ -8,6 +8,7 @@ dependencies {
     compile "org.aspectj:aspectjweaver:$aspectjVersion"
     compile "org.aspectj:aspectjrt:$aspectjVersion"
 
+    compile 'com.google.inject:guice:3.0'
     compile 'com.google.guava:guava:15.0'
     compile 'commons-collections:commons-collections:3.2.1'
     compile 'org.apache.commons:commons-lang3:3.1'
@@ -21,4 +22,28 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile 'log4j:log4j:1.2.17'
     testCompile 'org.slf4j:slf4j-log4j12:1.7.7'
+}
+
+//apply plugin: 'maven'
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: "file://localhost/Users/gautham.srinivas/.m2/repository")
+//        }
+//    }
+//}
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+group = 'org.gradle.sample'
+version = '1.0'
+
+publishing {
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "file://Users/gautham.srinivas/.m2/repository"
+        }
+    }
 }
